@@ -8,7 +8,8 @@ export class OpenHouseService {
         .from('open_houses')
         .select(`
           *,
-          properties:property_id (title, images)
+          properties (title, images),
+          agent_profiles (name)
         `);
 
       if (filters?.city) {
@@ -20,6 +21,7 @@ export class OpenHouseService {
 
       const { data, error } = await query;
       if (error) throw error;
+
       return data || [];
     } catch (err) {
       console.error('Get open houses error:', err);
@@ -34,6 +36,7 @@ export class OpenHouseService {
         .insert({
           property_id: data.propertyId,
           agent_id: data.agentId,
+          agent_name: data.agentName,
           date: data.date,
           start_time: data.startTime,
           end_time: data.endTime,
@@ -68,12 +71,7 @@ export class OpenHouseService {
         .from('open_house_leads')
         .insert({
           open_house_id: openHouseId,
-          name: data.name,
-          email: data.email,
-          phone: data.phone,
-          notes: data.notes,
-          interested_in_similar: data.interestedInSimilar,
-          prequalified: data.prequalified,
+          ...data,
           follow_up_status: 'pending'
         });
 

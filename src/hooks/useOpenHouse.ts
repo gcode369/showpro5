@@ -28,13 +28,13 @@ export function useOpenHouse() {
       setOpenHouses(prev => [...prev, newOpenHouse]);
       return newOpenHouse;
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to create open house';
-      setError(message);
-      throw new Error(message);
+      console.error('Create open house error:', err);
+      setError('Failed to create open house');
+      throw err;
     }
   };
 
-  const registerForOpenHouse = async (openHouseId: string, attendeeData: {
+  const registerForOpenHouse = async (openHouseId: string, data: {
     name: string;
     email: string;
     phone: string;
@@ -44,11 +44,12 @@ export function useOpenHouse() {
   }) => {
     try {
       setError(null);
-      await openHouseService.registerAttendee(openHouseId, attendeeData);
+      await openHouseService.registerAttendee(openHouseId, data);
+      await fetchOpenHouses(); // Refresh the list to update attendee count
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Failed to register for open house';
-      setError(message);
-      throw new Error(message);
+      console.error('Registration error:', err);
+      setError('Failed to register for open house');
+      throw err;
     }
   };
 
@@ -56,8 +57,8 @@ export function useOpenHouse() {
     openHouses,
     loading,
     error,
+    fetchOpenHouses,
     createOpenHouse,
-    registerForOpenHouse,
-    refreshOpenHouses: fetchOpenHouses
+    registerForOpenHouse
   };
 }

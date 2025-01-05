@@ -4,18 +4,20 @@ import { Button } from '../common/Button';
 import type { TimeSlotInput } from '../../types/calendar';
 
 type TimeSlotModalProps = {
+  propertyId: string;
+  agentId: string;
   onClose: () => void;
   onAdd: (slots: TimeSlotInput[]) => void;
 };
 
-export function TimeSlotModal({ onClose, onAdd }: TimeSlotModalProps) {
+export function TimeSlotModal({ propertyId, agentId, onClose, onAdd }: TimeSlotModalProps) {
   const [slots, setSlots] = useState<TimeSlotInput[]>([{
     date: new Date().toISOString().split('T')[0],
     startTime: '09:00',
     endTime: '10:00',
     maxAttendees: 1,
-    propertyId: '',
-    agentId: '',
+    propertyId,
+    agentId,
     isBooked: false,
     currentAttendees: 0
   }]);
@@ -71,6 +73,7 @@ export function TimeSlotModal({ onClose, onAdd }: TimeSlotModalProps) {
                 setSlots(slots.map(slot => ({ ...slot, date: newDate })));
               }}
               className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              min={new Date().toISOString().split('T')[0]}
             />
           </div>
 

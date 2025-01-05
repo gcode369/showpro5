@@ -31,7 +31,7 @@ export function AgentCalendar() {
   };
 
   const handleAddTimeSlots = async (slots: TimeSlotInput[]) => {
-    if (!selectedProperty) return;
+    if (!selectedProperty || !user?.id) return;
 
     try {
       await addPropertyShowing(selectedProperty, slots);
@@ -76,8 +76,10 @@ export function AgentCalendar() {
         {/* Calendar grid will go here */}
       </div>
 
-      {showModal && selectedProperty && (
+      {showModal && selectedProperty && user?.id && (
         <TimeSlotModal
+          propertyId={selectedProperty.id}
+          agentId={user.id}
           onClose={() => setShowModal(false)}
           onAdd={handleAddTimeSlots}
         />

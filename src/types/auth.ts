@@ -5,6 +5,9 @@ export type AuthUser = {
   email: string;
   name: string;
   role: UserRole;
+  areas?: string[];
+  bio?: string;
+  phone?: string;
   subscriptionStatus?: 'trial' | 'active' | 'inactive';
   subscriptionTier?: 'basic' | 'premium';
 };
@@ -32,6 +35,8 @@ export type UserRegistrationData = {
   username?: string;
   phone?: string;
   role: UserRole;
+  areas?: string[];
+  bio?: string;
   preferredAreas?: string[];
   preferredContact?: 'email' | 'phone' | 'both';
   prequalified?: boolean;
