@@ -8,6 +8,7 @@ import { CalendarPage } from '../pages/Calendar';
 import { ClientsPage } from '../pages/Clients';
 import { ProfilePage } from '../pages/Profile';
 import { SubscriptionPage } from '../pages/subscription';
+import { OpenHousesPage } from '../pages/agent/OpenHousesPage';
 import { 
   AgentLoginPage,
   ClientLoginPage,
@@ -63,6 +64,7 @@ export function AppRoutes() {
       }>
         <Route index element={<CalendarPage />} />
         <Route path="properties" element={<PropertiesPage />} />
+        <Route path="open-houses" element={<OpenHousesPage />} />
         <Route path="clients" element={<ClientsPage />} />
         <Route path="profile" element={<ProfilePage />} />
       </Route>

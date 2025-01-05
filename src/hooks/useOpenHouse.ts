@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { openHouseService } from '../services/openHouse/OpenHouseService';
 import type { OpenHouse } from '../types/openHouse';
 
@@ -21,7 +21,7 @@ export function useOpenHouse() {
     }
   };
 
-  const createOpenHouse = async (data: Omit<OpenHouse, 'id' | 'agentName' | 'attendees'>) => {
+  const createOpenHouse = async (data: Omit<OpenHouse, 'id' | 'currentAttendees'>) => {
     try {
       setError(null);
       const newOpenHouse = await openHouseService.createOpenHouse(data);
@@ -51,10 +51,6 @@ export function useOpenHouse() {
       throw new Error(message);
     }
   };
-
-  useEffect(() => {
-    fetchOpenHouses();
-  }, []);
 
   return {
     openHouses,

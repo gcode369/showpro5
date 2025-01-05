@@ -10,15 +10,12 @@ export type OpenHouse = {
   city: string;
   province: string;
   postalCode: string;
-  attendees: Array<{
-    id: string;
-    name: string;
-    email: string;
-  }>;
   maxAttendees?: number;
+  currentAttendees: number;
+  listingUrl?: string;
 };
 
-export type Area = {
-  city: string;
-  province: string;
+export type OpenHouseListProps = {
+  openHouses: OpenHouse[];
+  onDelete: (id: string) => void;
 };

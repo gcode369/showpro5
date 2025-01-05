@@ -1,16 +1,11 @@
-import React from 'react';
-import { Calendar, MapPin, Users, ExternalLink, Trash2 } from 'lucide-react';
-import { Button } from '../common/Button';
 import { OpenHouseCard } from './OpenHouseCard';
-import { useOpenHouses } from '../../hooks/useOpenHouses';
+import type { OpenHouseListProps } from '../../types/openHouse';
 
-export function OpenHouseList() {
-  const { openHouses, deleteOpenHouse } = useOpenHouses();
-
+export function OpenHouseList({ openHouses, onDelete }: OpenHouseListProps) {
   if (openHouses.length === 0) {
     return (
-      <div className="text-center py-12 bg-white rounded-lg shadow-lg">
-        <p className="text-gray-600">You haven't published any open houses yet.</p>
+      <div className="text-center py-12 bg-white rounded-lg shadow-sm">
+        <p className="text-gray-600">No open houses scheduled yet.</p>
       </div>
     );
   }
@@ -21,7 +16,7 @@ export function OpenHouseList() {
         <OpenHouseCard
           key={openHouse.id}
           openHouse={openHouse}
-          onDelete={deleteOpenHouse}
+          onDelete={onDelete}
         />
       ))}
     </div>
