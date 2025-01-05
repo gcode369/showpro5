@@ -1,0 +1,1 @@
+export { OpenHousesPage } from './OpenHousesPage';

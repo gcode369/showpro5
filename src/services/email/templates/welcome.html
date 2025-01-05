@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Welcome to ShowPro</title>
+</head>
+<body>
+  <h1>Welcome to ShowPro, {{name}}!</h1>
+  <p>Thank you for joining ShowPro. We're excited to help you {{userType === 'agent' ? 'manage your real estate business' : 'find your perfect property'}}.</p>
+  <p>Get started by:</p>
+  <ul>
+    {{#if userType === 'agent'}}
+    <li>Adding your properties</li>
+    <li>Setting up your availability</li>
+    <li>Customizing your profile</li>
+    {{else}}
+    <li>Browsing available properties</li>
+    <li>Setting up your preferences</li>
+    <li>Following top agents</li>
+    {{/if}}
+  </ul>
+</body>
+</html>

@@ -1,0 +1,193 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String      @id @default(cuid())
+  email             String      @unique
+  name              String
+  username          String?     @unique
+  hashedPassword    String
+  role              UserRole
+  createdAt         DateTime    @default(now())
+  updatedAt         DateTime    @updatedAt
+  
+  // Agent specific fields
+  agentProfile      AgentProfile?
+  properties        Property[]
+  showings         PropertyShowing[]
+  receivedBookings  Booking[]    @relation("AgentBookings")
+  
+  // Client specific fields
+  clientProfile     ClientProfile?
+  bookings         Booking[]     @relation("ClientBookings")
+  following        Following[]
+  
+  // Common fields
+  notifications    Notification[]
+}
+
+model AgentProfile {
+  id              String    @id @default(cuid())
+  userId          String    @unique
+  user            User      @relation(fields: [userId], references: [id])
+  phone           String
+  bio             String?
+  photo           String?
+  areas           String[]
+  languages       String[]
+  certifications  String[]
+  rating          Float?
+  reviews         Int       @default(0)
+  subscriptionTier SubscriptionTier
+  subscriptionStatus SubscriptionStatus
+}
+
+model ClientProfile {
+  id              String    @id @default(cuid())
+  userId          String    @unique
+  user            User      @relation(fields: [userId], references: [id])
+  phone           String
+  preferredAreas  String[]
+  preferredContact PreferredContact
+}
+
+model Property {
+  id          String    @id @default(cuid())
+  title       String
+  address     String
+  city        String
+  price       Float
+  description String
+  images      String[]
+  agentId     String
+  agent       User      @relation(fields: [agentId], references: [id])
+  status      PropertyStatus
+  type        PropertyType
+  features    String[]
+  bedrooms    Int?
+  bathrooms   Float?
+  squareFeet  Int?
+  listingUrl  String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  showings    PropertyShowing[]
+  bookings    Booking[]
+}
+
+model PropertyShowing {
+  id          String    @id @default(cuid())
+  propertyId  String
+  property    Property  @relation(fields: [propertyId], references: [id])
+  agentId     String
+  agent       User      @relation(fields: [agentId], references: [id])
+  timeSlots   ShowingTimeSlot[]
+  notes       String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model ShowingTimeSlot {
+  id              String    @id @default(cuid())
+  showingId       String
+  showing         PropertyShowing @relation(fields: [showingId], references: [id])
+  date            DateTime
+  startTime       String
+  endTime         String
+  maxAttendees    Int       @default(1)
+  currentAttendees Int      @default(0)
+  isBooked        Boolean   @default(false)
+  booking         Booking?
+}
+
+model Booking {
+  id            String    @id @default(cuid())
+  propertyId    String
+  property      Property  @relation(fields: [propertyId], references: [id])
+  agentId       String
+  agent         User      @relation("AgentBookings", fields: [agentId], references: [id])
+  clientId      String
+  client        User      @relation("ClientBookings", fields: [clientId], references: [id])
+  timeSlotId    String    @unique
+  timeSlot      ShowingTimeSlot @relation(fields: [timeSlotId], references: [id])
+  status        BookingStatus
+  notes         String?
+  attendees     Int
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Following {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  agentId     String
+  createdAt   DateTime  @default(now())
+
+  @@unique([userId, agentId])
+}
+
+model Notification {
+  id          String    @id @default(cuid())
+  userId      String
+  user        User      @relation(fields: [userId], references: [id])
+  type        NotificationType
+  title       String
+  message     String
+  read        Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+}
+
+enum UserRole {
+  AGENT
+  CLIENT
+}
+
+enum SubscriptionTier {
+  BASIC
+  PREMIUM
+}
+
+enum SubscriptionStatus {
+  TRIAL
+  ACTIVE
+  INACTIVE
+}
+
+enum PropertyStatus {
+  AVAILABLE
+  PENDING
+  SOLD
+}
+
+enum PropertyType {
+  HOUSE
+  CONDO
+  TOWNHOUSE
+  LAND
+}
+
+enum BookingStatus {
+  PENDING
+  CONFIRMED
+  CANCELLED
+}
+
+enum PreferredContact {
+  EMAIL
+  PHONE
+  BOTH
+}
+
+enum NotificationType {
+  BOOKING_REQUEST
+  BOOKING_CONFIRMED
+  BOOKING_CANCELLED
+  FOLLOWING
+  SYSTEM
+}
