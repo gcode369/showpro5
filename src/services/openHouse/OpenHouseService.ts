@@ -2,7 +2,7 @@ import { supabase } from '../supabase';
 import type { OpenHouse } from '../../types/openHouse';
 
 export class OpenHouseService {
-  async getOpenHouses(filters?: { city?: string; date?: string }) {
+  async getOpenHouses(filters?: { city?: string; date?: string }): Promise<OpenHouse[]> {
     try {
       let query = supabase
         .from('open_houses')
@@ -22,7 +22,22 @@ export class OpenHouseService {
       const { data, error } = await query;
       if (error) throw error;
 
-      return data || [];
+      return data.map(oh => ({
+        id: oh.id,
+        propertyId: oh.property_id,
+        date: oh.date,
+        startTime: oh.start_time,
+        endTime: oh.end_time,
+        agentId: oh.agent_id,
+        agentName: oh.agent_profiles?.name || '',
+        address: oh.address,
+        city: oh.city,
+        province: oh.province,
+        postalCode: oh.postal_code,
+        maxAttendees: oh.max_attendees,
+        currentAttendees: oh.current_attendees,
+        listingUrl: oh.listing_url
+      }));
     } catch (err) {
       console.error('Get open houses error:', err);
       throw err instanceof Error ? err : new Error('Failed to fetch open houses');
@@ -36,7 +51,6 @@ export class OpenHouseService {
         .insert({
           property_id: data.propertyId,
           agent_id: data.agentId,
-          agent_name: data.agentName,
           date: data.date,
           start_time: data.startTime,
           end_time: data.endTime,

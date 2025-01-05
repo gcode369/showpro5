@@ -1,13 +1,11 @@
 import React, { useState } from 'react';
-import { Search as SearchIcon, Building2, UserCircle } from 'lucide-react';
+import { Building2, UserCircle } from 'lucide-react';
 import { PropertySearch } from '../../components/search/PropertySearch';
 import { AgentSearch } from '../../components/search/AgentSearch';
 import { Button } from '../../components/common/Button';
 
-type SearchType = 'properties' | 'agents';
-
 export function SearchPage() {
-  const [searchType, setSearchType] = useState<SearchType>('properties');
+  const [searchType, setSearchType] = useState<'properties' | 'agents'>('properties');
 
   return (
     <>

@@ -12,4 +12,5 @@ export type Agent = {
   certifications?: string[];
   subscriptionStatus: 'active' | 'inactive' | 'trial';
   subscriptionTier: 'basic' | 'premium';
+  photo?: string;
 };

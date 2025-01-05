@@ -1,5 +1,4 @@
-import React from 'react';
-import { MapPin, Star, Users } from 'lucide-react';
+import { MapPin, Star } from 'lucide-react';
 import { Button } from '../common/Button';
 import { useFollowing } from '../../hooks/useFollowing';
 import { useAuthStore } from '../../store/authStore';
@@ -23,11 +22,13 @@ export function AgentCard({ agent, onViewProfile }: AgentCardProps) {
           <p className="text-gray-600">@{agent.username}</p>
           
           <div className="mt-4 space-y-2">
-            <div className="flex items-center gap-2">
-              <Star className="w-4 h-4 text-yellow-400 fill-current" />
-              <span className="font-semibold">{agent.rating}</span>
-              <span className="text-gray-600">({agent.reviews} reviews)</span>
-            </div>
+            {agent.rating && (
+              <div className="flex items-center gap-2">
+                <Star className="w-4 h-4 text-yellow-400 fill-current" />
+                <span className="font-semibold">{agent.rating}</span>
+                <span className="text-gray-600">({agent.reviews} reviews)</span>
+              </div>
+            )}
             
             <div className="flex items-center gap-2 text-gray-600">
               <MapPin className="w-4 h-4" />
