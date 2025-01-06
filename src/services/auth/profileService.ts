@@ -6,7 +6,6 @@ export async function getUserProfile(userId: string, role: UserRole): Promise<Ag
   const profileTable = role === 'agent' ? 'agent_profiles' : 'client_profiles';
   
   try {
-    // First try to get existing profile
     const { data: profile, error } = await supabase
       .from(profileTable)
       .select('*')
@@ -16,13 +15,11 @@ export async function getUserProfile(userId: string, role: UserRole): Promise<Ag
     if (error && error.code !== 'PGRST116') throw error;
 
     if (!profile) {
-      // Create default profile if none exists
-      const defaultProfile = await createDefaultProfile(userId, role);
-      return defaultProfile;
+      return createDefaultProfile(userId, role);
     }
 
-    // Update existing profile with any missing fields
-    const updatedProfile = await ensureProfileFields(profile, role);
+    // Ensure all required fields exist
+    const updatedProfile = await ensureProfileFields(profile, userId, role);
     return updatedProfile;
   } catch (err) {
     console.error('Profile fetch error:', err);
@@ -30,56 +27,44 @@ export async function getUserProfile(userId: string, role: UserRole): Promise<Ag
   }
 }
 
-async function createDefaultProfile(userId: string, role: UserRole): Promise<AgentProfile | ClientProfile> {
+async function createDefaultProfile(userId: string, role: UserRole) {
   const profileData = {
     user_id: userId,
-    name: role === 'agent' ? 'New Agent' : 'New Client',
+    name: '',
+    areas: [],
     ...(role === 'agent' && {
-      subscription_status: 'trial' as const,
-      subscription_tier: 'basic' as const,
-      areas: [],
       languages: [],
-      certifications: []
+      certifications: [],
+      subscription_status: 'trial' as const,
+      subscription_tier: 'basic' as const
     })
   };
 
-  const { data: profile, error } = await supabase
+  const { data, error } = await supabase
     .from(role === 'agent' ? 'agent_profiles' : 'client_profiles')
     .insert(profileData)
     .select()
     .single();
 
   if (error) throw error;
-  return profile;
+  return data;
 }
 
-async function ensureProfileFields(profile: any, role: UserRole) {
-  const updates: any = {};
-  
-  if (role === 'agent') {
-    // Ensure agent-specific fields exist
-    if (!profile.areas) updates.areas = [];
-    if (!profile.languages) updates.languages = [];
-    if (!profile.certifications) updates.certifications = [];
-    if (!profile.subscription_status) updates.subscription_status = 'trial';
-    if (!profile.subscription_tier) updates.subscription_tier = 'basic';
-  } else {
-    // Ensure client-specific fields exist
-    if (!profile.preferred_areas) updates.preferred_areas = [];
-    if (!profile.preferred_contact) updates.preferred_contact = 'email';
-  }
-
-  // Only update if there are missing fields
-  if (Object.keys(updates).length > 0) {
-    const { data: updatedProfile, error } = await supabase
-      .from(role === 'agent' ? 'agent_profiles' : 'client_profiles')
-      .update(updates)
-      .eq('user_id', profile.user_id)
+async function ensureProfileFields(profile: any, userId: string, role: UserRole) {
+  if (role === 'agent' && (!profile.areas || !profile.languages || !profile.certifications)) {
+    const { data, error } = await supabase
+      .from('agent_profiles')
+      .update({
+        areas: profile.areas || [],
+        languages: profile.languages || [],
+        certifications: profile.certifications || []
+      })
+      .eq('user_id', userId)
       .select()
       .single();
 
     if (error) throw error;
-    return updatedProfile;
+    return data;
   }
 
   return profile;

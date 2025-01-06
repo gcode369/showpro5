@@ -9,13 +9,13 @@ export function useOpenHouse() {
 
   const fetchOpenHouses = async (filters?: { city?: string; date?: string }) => {
     try {
-      setError(null);
       setLoading(true);
+      setError(null);
       const data = await openHouseService.getOpenHouses(filters);
       setOpenHouses(data);
     } catch (err) {
-      console.error('Error in useOpenHouse:', err);
-      setError('Failed to fetch open houses. Please try again later.');
+      console.error('Error fetching open houses:', err);
+      setError('Failed to fetch open houses');
     } finally {
       setLoading(false);
     }
@@ -23,32 +23,16 @@ export function useOpenHouse() {
 
   const createOpenHouse = async (data: Omit<OpenHouse, 'id' | 'currentAttendees'>) => {
     try {
+      setLoading(true);
       setError(null);
       const newOpenHouse = await openHouseService.createOpenHouse(data);
       setOpenHouses(prev => [...prev, newOpenHouse]);
+      setLoading(false);
       return newOpenHouse;
     } catch (err) {
-      console.error('Create open house error:', err);
+      console.error('Error creating open house:', err);
       setError('Failed to create open house');
-      throw err;
-    }
-  };
-
-  const registerForOpenHouse = async (openHouseId: string, data: {
-    name: string;
-    email: string;
-    phone: string;
-    notes?: string;
-    interestedInSimilar: boolean;
-    prequalified: boolean;
-  }) => {
-    try {
-      setError(null);
-      await openHouseService.registerAttendee(openHouseId, data);
-      await fetchOpenHouses(); // Refresh the list to update attendee count
-    } catch (err) {
-      console.error('Registration error:', err);
-      setError('Failed to register for open house');
+      setLoading(false);
       throw err;
     }
   };
@@ -58,7 +42,6 @@ export function useOpenHouse() {
     loading,
     error,
     fetchOpenHouses,
-    createOpenHouse,
-    registerForOpenHouse
+    createOpenHouse
   };
 }
