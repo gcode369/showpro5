@@ -8,6 +8,8 @@ export type AuthUser = {
   areas?: string[];
   bio?: string;
   phone?: string;
+  languages?: string[];
+  certifications?: string[];
   subscriptionStatus?: 'trial' | 'active' | 'inactive';
   subscriptionTier?: 'basic' | 'premium';
 };
@@ -23,11 +25,6 @@ export type AuthSession = {
   };
 };
 
-export type AuthResponse = {
-  session: AuthSession | null;
-  user: AuthUser;
-};
-
 export type UserRegistrationData = {
   email: string;
   password: string;
@@ -37,6 +34,8 @@ export type UserRegistrationData = {
   role: UserRole;
   areas?: string[];
   bio?: string;
+  languages?: string[];
+  certifications?: string[];
   preferredAreas?: string[];
   preferredContact?: 'email' | 'phone' | 'both';
   prequalified?: boolean;

@@ -8,8 +8,8 @@ export type Agent = {
   rating?: number;
   reviews?: number;
   bio?: string;
-  languages?: string[];
-  certifications?: string[];
+  languages: string[];
+  certifications: string[];
   subscriptionStatus: 'active' | 'inactive' | 'trial';
   subscriptionTier: 'basic' | 'premium';
   photo?: string;

@@ -9,7 +9,7 @@ export class OpenHouseService {
         .select(`
           *,
           properties (title, images),
-          agent_profiles (name)
+          agent_profiles!inner (name)
         `);
 
       if (filters?.city) {
@@ -36,7 +36,10 @@ export class OpenHouseService {
         postalCode: oh.postal_code,
         maxAttendees: oh.max_attendees,
         currentAttendees: oh.current_attendees,
-        listingUrl: oh.listing_url
+        property: {
+          title: oh.properties?.title,
+          images: oh.properties?.images || []
+        }
       }));
     } catch (err) {
       console.error('Get open houses error:', err);

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { MapPin } from 'lucide-react';
 import { Button } from '../common/Button';
 import { useAuthStore } from '../../store/authStore';
@@ -7,15 +7,21 @@ import { BC_CITIES } from '../../constants/locations';
 
 export function AgentProfileSettings() {
   const { user } = useAuthStore();
-  const { updateProfile, loading, error } = useProfile();
+  const { updateProfile, loading, error, syncProfile } = useProfile();
   const [formData, setFormData] = useState({
     name: user?.name || '',
     phone: user?.phone || '',
     email: user?.email || '',
     areas: user?.areas || [],
-    bio: user?.bio || ''
+    bio: user?.bio || '',
+    languages: user?.languages || [],
+    certifications: user?.certifications || []
   });
   const [success, setSuccess] = useState(false);
+
+  useEffect(() => {
+    syncProfile();
+  }, []);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -111,7 +117,7 @@ export function AgentProfileSettings() {
               onChange={handleChange}
               rows={4}
               className="w-full px-4 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Tell clients about yourself and your experience..."
+              placeholder="Tell clients about yourself, your experience, and your areas of expertise..."
             />
           </div>
         </div>
