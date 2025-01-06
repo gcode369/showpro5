@@ -26,7 +26,6 @@ export function useProperties(agentId?: string) {
         )
       `);
       
-      // If agentId is provided, filter by that, otherwise use current user's id
       const filterAgentId = agentId || user?.id;
       if (filterAgentId) {
         query = query.eq('agent_id', filterAgentId);
@@ -46,6 +45,7 @@ export function useProperties(agentId?: string) {
 
   const addProperty = async (propertyData: Omit<Property, 'id' | 'created_at' | 'updated_at'>) => {
     try {
+      setLoading(true);
       if (!user) {
         throw new Error('User not authenticated');
       }
@@ -64,10 +64,12 @@ export function useProperties(agentId?: string) {
 
       if (insertError) throw insertError;
       setProperties(prev => [...prev, data]);
+      setLoading(false);
       return data;
     } catch (err) {
       console.error('Error adding property:', err);
       setError(err instanceof Error ? err.message : 'Failed to add property');
+      setLoading(false);
       throw err;
     }
   };

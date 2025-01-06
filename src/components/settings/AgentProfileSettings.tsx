@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { MapPin } from 'lucide-react';
+import { MapPin, Globe, Award } from 'lucide-react';
 import { Button } from '../common/Button';
 import { useAuthStore } from '../../store/authStore';
 import { useProfile } from '../../hooks/useProfile';
 import { BC_CITIES } from '../../constants/locations';
+
+const LANGUAGES = ['English', 'French', 'Mandarin', 'Cantonese', 'Punjabi', 'Spanish'];
+const CERTIFICATIONS = ['Licensed Real Estate Agent', 'Certified Negotiation Expert', 'Luxury Home Specialist'];
 
 export function AgentProfileSettings() {
   const { user } = useAuthStore();
@@ -29,12 +32,12 @@ export function AgentProfileSettings() {
     setSuccess(false);
   };
 
-  const toggleArea = (city: string) => {
+  const toggleItem = (field: 'areas' | 'languages' | 'certifications', item: string) => {
     setFormData(prev => ({
       ...prev,
-      areas: prev.areas.includes(city)
-        ? prev.areas.filter(a => a !== city)
-        : [...prev.areas, city]
+      [field]: prev[field].includes(item)
+        ? prev[field].filter(i => i !== item)
+        : [...prev[field], item]
     }));
     setSuccess(false);
   };
@@ -94,7 +97,7 @@ export function AgentProfileSettings() {
               {BC_CITIES.map(city => (
                 <div
                   key={city}
-                  onClick={() => toggleArea(city)}
+                  onClick={() => toggleItem('areas', city)}
                   className={`p-2 border rounded cursor-pointer transition-colors ${
                     formData.areas.includes(city)
                       ? 'bg-blue-50 border-blue-500 text-blue-700'
@@ -102,6 +105,56 @@ export function AgentProfileSettings() {
                   }`}
                 >
                   {city}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Languages
+            </label>
+            <div className="flex items-center gap-2 mb-2">
+              <Globe className="w-5 h-5 text-gray-400" />
+              <span className="text-sm text-gray-600">Select languages you speak</span>
+            </div>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-2">
+              {LANGUAGES.map(lang => (
+                <div
+                  key={lang}
+                  onClick={() => toggleItem('languages', lang)}
+                  className={`p-2 border rounded cursor-pointer transition-colors ${
+                    formData.languages.includes(lang)
+                      ? 'bg-blue-50 border-blue-500 text-blue-700'
+                      : 'hover:border-gray-400'
+                  }`}
+                >
+                  {lang}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Certifications
+            </label>
+            <div className="flex items-center gap-2 mb-2">
+              <Award className="w-5 h-5 text-gray-400" />
+              <span className="text-sm text-gray-600">Select your certifications</span>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+              {CERTIFICATIONS.map(cert => (
+                <div
+                  key={cert}
+                  onClick={() => toggleItem('certifications', cert)}
+                  className={`p-2 border rounded cursor-pointer transition-colors ${
+                    formData.certifications.includes(cert)
+                      ? 'bg-blue-50 border-blue-500 text-blue-700'
+                      : 'hover:border-gray-400'
+                  }`}
+                >
+                  {cert}
                 </div>
               ))}
             </div>
