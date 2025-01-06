@@ -2,7 +2,7 @@ import { supabase } from '../supabase';
 import type { OpenHouse } from '../../types/openHouse';
 
 export class OpenHouseService {
-  async getOpenHouses(filters?: { city?: string; date?: string }) {
+  async getOpenHouses(filters?: { city?: string; date?: string }): Promise<OpenHouse[]> {
     try {
       let query = supabase
         .from('open_houses')
@@ -75,6 +75,30 @@ export class OpenHouseService {
       return openHouse;
     } catch (err) {
       console.error('Create open house error:', err);
+      throw err;
+    }
+  }
+
+  async registerAttendee(openHouseId: string, data: {
+    name: string;
+    email: string;
+    phone: string;
+    notes?: string;
+    interestedInSimilar: boolean;
+    prequalified: boolean;
+  }) {
+    try {
+      const { error } = await supabase
+        .from('open_house_leads')
+        .insert({
+          open_house_id: openHouseId,
+          ...data,
+          follow_up_status: 'pending'
+        });
+
+      if (error) throw error;
+    } catch (err) {
+      console.error('Register attendee error:', err);
       throw err;
     }
   }
