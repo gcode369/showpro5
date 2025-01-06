@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { persist } from 'zustand/middleware';
 import type { AuthUser } from '../types/auth';
 
 type AuthStore = {
@@ -9,12 +10,19 @@ type AuthStore = {
   updateUser: (updates: Partial<AuthUser>) => void;
 };
 
-export const useAuthStore = create<AuthStore>((set) => ({
-  user: null,
-  isAuthenticated: false,
-  setUser: (user) => set({ user, isAuthenticated: true }),
-  clearUser: () => set({ user: null, isAuthenticated: false }),
-  updateUser: (updates) => set((state) => ({
-    user: state.user ? { ...state.user, ...updates } : null
-  }))
-}));
+export const useAuthStore = create<AuthStore>()(
+  persist(
+    (set) => ({
+      user: null,
+      isAuthenticated: false,
+      setUser: (user) => set({ user, isAuthenticated: true }),
+      clearUser: () => set({ user: null, isAuthenticated: false }),
+      updateUser: (updates) => set((state) => ({
+        user: state.user ? { ...state.user, ...updates } : null
+      }))
+    }),
+    {
+      name: 'auth-storage'
+    }
+  )
+);
