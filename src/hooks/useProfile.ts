@@ -1,5 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuthStore } from '../store/authStore';
+import { supabase } from '../services/supabase';
 import type { Agent } from '../types/agent';
 
 export function useProfile() {
@@ -7,18 +8,61 @@ export function useProfile() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (user?.id) {
+      syncProfile();
+    }
+  }, [user?.id]);
+
+  const syncProfile = async () => {
+    if (!user?.id) return;
+
+    try {
+      setLoading(true);
+      const { data: profile, error: profileError } = await supabase
+        .from(user.role === 'agent' ? 'agent_profiles' : 'client_profiles')
+        .select('*')
+        .eq('user_id', user.id)
+        .single();
+
+      if (profileError) throw profileError;
+
+      // Update local state with synced profile data
+      updateUser({
+        ...user,
+        ...profile
+      });
+    } catch (err) {
+      console.error('Profile sync error:', err);
+      setError(err instanceof Error ? err.message : 'Failed to sync profile');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const updateProfile = async (updates: Partial<Agent>) => {
     try {
       setLoading(true);
       setError(null);
 
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+      if (!user?.id) throw new Error('User not authenticated');
+
+      const { error: updateError } = await supabase
+        .from(user.role === 'agent' ? 'agent_profiles' : 'client_profiles')
+        .update(updates)
+        .eq('user_id', user.id);
+
+      if (updateError) throw updateError;
+
       // Update local state
-      updateUser(updates);
+      updateUser({
+        ...user,
+        ...updates
+      });
+
       return true;
     } catch (err) {
+      console.error('Profile update error:', err);
       setError(err instanceof Error ? err.message : 'Failed to update profile');
       return false;
     } finally {
@@ -29,6 +73,7 @@ export function useProfile() {
   return {
     updateProfile,
     loading,
-    error
+    error,
+    syncProfile
   };
 }

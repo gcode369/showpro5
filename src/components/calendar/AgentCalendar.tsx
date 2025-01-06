@@ -12,7 +12,7 @@ import type { TimeSlotInput } from '../../types/calendar';
 export function AgentCalendar() {
   const { user } = useAuthStore();
   const { properties } = useProperties(user?.id);
-  const { addPropertyShowing } = usePropertyShowings(user?.id || '');
+  const { showings, addPropertyShowing } = usePropertyShowings(user?.id || '');
   
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedProperty, setSelectedProperty] = useState<Property | null>(properties[0] || null);
